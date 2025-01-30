@@ -1,0 +1,7 @@
+group test
+    FSharp.Core
+    Microsoft.NET.Test.Sdk
+    NUnit
+    FsUnit
+    NUnit3TestAdapter
+    NUnit.Analyzers

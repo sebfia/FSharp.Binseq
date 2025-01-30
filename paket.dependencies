@@ -1,0 +1,16 @@
+group main
+    source https://api.nuget.org/v3/index.json
+    storage:none
+    framework: netstandard2.1, net8, net9
+    nuget FSharp.Core
+
+group test
+    source https://api.nuget.org/v3/index.json
+    storage:none
+    framework:net9
+    nuget FSharp.Core
+    nuget FsUnit
+    nuget Microsoft.NET.Test.Sdk
+    nuget NUnit
+    nuget NUnit.Analyzers
+    nuget NUnit3TestAdapter

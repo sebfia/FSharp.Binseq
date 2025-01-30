@@ -1,0 +1,29 @@
+STORAGE: NONE
+RESTRICTION: || (== net8.0) (== net9.0) (== netstandard2.1)
+NUGET
+  remote: https://api.nuget.org/v3/index.json
+    FSharp.Core (9.0.101)
+
+GROUP test
+STORAGE: NONE
+RESTRICTION: == net9.0
+NUGET
+  remote: https://api.nuget.org/v3/index.json
+    FSharp.Core (9.0.101)
+    FsUnit (7.0.1)
+      FSharp.Core (>= 5.0.2)
+      NUnit (>= 4.0.1)
+    Microsoft.CodeCoverage (17.12)
+    Microsoft.NET.Test.Sdk (17.12)
+      Microsoft.CodeCoverage (>= 17.12)
+      Microsoft.TestPlatform.TestHost (>= 17.12)
+    Microsoft.TestPlatform.ObjectModel (17.12)
+      System.Reflection.Metadata (>= 1.6)
+    Microsoft.TestPlatform.TestHost (17.12)
+      Microsoft.TestPlatform.ObjectModel (>= 17.12)
+      Newtonsoft.Json (>= 13.0.1)
+    Newtonsoft.Json (13.0.3)
+    NUnit (4.3.2)
+    NUnit.Analyzers (4.6)
+    NUnit3TestAdapter (4.6)
+    System.Reflection.Metadata (9.0.1)
