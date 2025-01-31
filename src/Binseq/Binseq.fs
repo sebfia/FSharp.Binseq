@@ -89,7 +89,6 @@
                 match bin with
                 | Writer _ -> (Error "Can not read from a writer!"),bin
                 | Reader r ->
-                    printfn "Current position: %i" r.BaseStream.Position
                     try (f r |> Ok),bin with ex -> (Error $"An exeption was thrown while trying to decode a value.{Environment.NewLine}{ex}"),bin
         let byte : Binseq<byte> = withReader (fun r -> r.ReadByte())
         let int16 : Binseq<int16> = withReader (fun r -> r.ReadInt16())

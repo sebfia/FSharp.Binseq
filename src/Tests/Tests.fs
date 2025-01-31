@@ -379,3 +379,38 @@ module ``Back And Forth With More Complex Types`` =
         let buffer = (Encoder.ofBookstore >> Raw.toBuffer) expected |> Result.defaultWith (fun e -> failwith e)
         let actual = (Raw.fromBuffer Decoder.ofBookstore) buffer |> Result.defaultWith (fun e -> failwith e)
         expected |> should equal actual
+
+module ``Using the Record Module for Prepending Headers`` =
+    open System
+    open NUnit.Framework
+    open Binseq
+
+    type RecordType =
+        | Book = 1uy
+        | Bookshelf = 2uy
+
+    module Header =
+
+        let decode = binseq {
+            let! length = Decode.int64
+            let! recType = Decode.byte ?> LanguagePrimitives.EnumOfValue<byte, RecordType>
+            return recType, length
+        }
+
+        let encode (recType: RecordType) length = Encode.int64 length *> Encode.byte (recType |> LanguagePrimitives.EnumToValue)
+
+    let decodeBook header = binseq {
+        let! book = Decoder.ofBook
+        return header,book
+    }
+
+    [<Test>]
+    let ``Create a header for a simple record`` () =
+        let expected = { Id = Guid.NewGuid(); Title = "Lord of the Rings"; Author = "J.R.R. Tolkien"}
+        let buffer = (Encoder.ofBook >> Record.toBuffer (Header.encode RecordType.Book)) expected |> Result.defaultWith (fun e -> failwith e)
+        let compareBuffer = (Encoder.ofBook >> Raw.toBuffer) expected |> Result.defaultWith (fun e -> failwith e)
+        let (recType,length),book = (Record.fromBuffer Header.decode decodeBook) buffer |> Result.defaultWith (fun e -> failwith e)
+        book |> should equal expected
+        recType |> should equal RecordType.Book
+        length |> should equal compareBuffer.Length
+        buffer.Length |> should equal (compareBuffer.Length + 9)
