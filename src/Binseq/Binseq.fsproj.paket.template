@@ -5,8 +5,8 @@ authors Sebastian Fialka
 description
     Binseq is an F# library that supports encoding and decoding of complex data from and to any sequential binary representation and provides a collection of functions to encode, decode and combine binary data in a functional style.
 files
-    ../../README.md ==> docs
-readme /docs/README.md
+    ../../Readme.md ==> docs
+readme /docs/Readme.md
 include-pdbs true
 projectUrl
     https://github.com/sebfia/FSharp.Binseq
