@@ -250,9 +250,15 @@ let buffer = (Encoder.ofBookstore >> Raw.toBuffer) bookStore |> Result.defaultWi
 let decoded = (Raw.fromBuffer Decoder.ofBookstore) buffer |> Result.defaultWith (fun e -> failwith e)
 ```
 
-### Working with Mixed Types in a single **Stream** and **Headers**
+### Using the Record Module
 
-When writing different types to a binary sequence like a stream, a way to identify the type of data that follows is needed. This is typically done using a header containing:
+The Record module provides functionality for writing and reading binary data with headers. This is particularly useful when dealing with files or streams that contain multiple records of different types.
+
+Here's how to use it with our complex types:
+
+### **Headers** - Working with Mixed Types in a Single Stream
+
+When writing different types to a single binary sequence like a stream, a way to identify the type of data that follows is needed. This is typically done using a header containing:
 
 1. The **length** of the following data
 2. A Type **discriminator** (usually a byte)
@@ -264,7 +270,62 @@ When writing different types to a binary sequence like a stream, a way to identi
 - Use **fixed-length** strings
 - **Avoid variable-length** types in headers
 
-Here's how to implement this pattern with **Binseq**:
+As we are using **Binseq** one would expect to be able to encode the header in the same way the payload is being encoded.  
+And that is exactly how this is done.  
+
+As the length of the encoded payload is not known beforehand, the encoder for the header needs a parameter for the length.  
+
+Its signature is therefore: ```int64 -> Binseq<unit>```.  
+Similarly data from the header might be necessary to decode the underlying payload. A timestamp that is contained in the metadata of the header might be carried over to the decoded data of the payload.
+
+#### Using the Record Module with Complex Types
+
+Below is a minimal sample of how to combine a header with a typed payload using the Record module:
+
+```fsharp
+// Define a discriminator for different types written to the same stream
+type RecordType =
+    | Book = 1uy
+    | Bookshelf = 2uy
+
+// Here we have a separate module for encoding and decoding headers. Simple headers do not necessarily need to have a defined type
+module Header =
+
+    // Our header contains only of a record type, that takes one byte and a length that takes 8 bytes -> 9 bytes at all
+    let decode = binseq {
+        let! length = Decode.int64
+            // ...optional metadata... (timestamp, version etc.)
+        let! recType = Decode.byte ?> LanguagePrimitives.EnumOfValue<byte, RecordType>
+        return recType, length
+    }
+
+    // As the length of the succeeding data isn't (always) known beforehand we can leave the task of giving the header-writer this number to the writer of the payload after all data has been written. Currently this requires the underlying stream to be seekable.
+    let encode (recType: RecordType) length = 
+        Encode.int64 length 
+            // ...optional metadata... (timestamp, version etc.)
+        *> Encode.byte (recType |> LanguagePrimitives.EnumToValue)
+
+// for convenience we define a function to decode a book from a re
+
+// 2) Write a Bookstore to a stream with Record.writeStream:
+let writeBookstoreToStream stream (store: Bookstore) =
+    Record.writeStream stream (fun _ -> ())
+        (headerEncoder length) // Provide a length if needed
+        (Encoder.ofBookstore store)
+
+// 3) Define a header decoder:
+let headerDecoder = binseq {
+    let! length = Decode.int64
+    let! recordType = Decode.byte
+    if recordType <> 1uy then
+        return! Decode.error "Invalid record type!"
+    return length
+}
+
+// 4) Read a Bookstore from a stream with Record.readStream:
+let readBookstoreFromStream stream =
+    Record.readStream headerDecoder (fun _ -> Decoder.ofBookstore) stream
+```
 
 ## Contributing
 
