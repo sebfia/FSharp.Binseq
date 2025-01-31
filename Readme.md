@@ -305,26 +305,23 @@ module Header =
             // ...optional metadata... (timestamp, version etc.)
         *> Encode.byte (recType |> LanguagePrimitives.EnumToValue)
 
-// for convenience we define a function to decode a book from a re
-
-// 2) Write a Bookstore to a stream with Record.writeStream:
-let writeBookstoreToStream stream (store: Bookstore) =
-    Record.writeStream stream (fun _ -> ())
-        (headerEncoder length) // Provide a length if needed
-        (Encoder.ofBookstore store)
-
-// 3) Define a header decoder:
-let headerDecoder = binseq {
-    let! length = Decode.int64
-    let! recordType = Decode.byte
-    if recordType <> 1uy then
-        return! Decode.error "Invalid record type!"
-    return length
+// For convenience we define a function to decode a book with a header and return the book and the header data to see if everything worked.
+let decodeBook header = binseq {
+    let! book = Decoder.ofBook
+    return header,book
 }
 
-// 4) Read a Bookstore from a stream with Record.readStream:
-let readBookstoreFromStream stream =
-    Record.readStream headerDecoder (fun _ -> Decoder.ofBookstore) stream
+
+// Encode and decode the book with a header
+    let book = { Id = Guid.NewGuid(); Title = "Lord of the Rings"; Author = "J.R.R. Tolkien"}
+    let buffer = (Encoder.ofBook >> Record.toBuffer (Header.encode RecordType.Book)) book |> Result.defaultWith (fun e -> failwith e)
+    // Encode the book without the header for comparison
+    let compareBuffer = (Encoder.ofBook >> Raw.toBuffer) book |> Result.defaultWith (fun e -> failwith e)
+    let (recType,length),decodedBook = (Record.fromBuffer Header.decode decodeBook) buffer |> Result.defaultWith (fun e -> failwith e)
+    // decodedBook and book should be the same
+    // recType should be RecordType.Book
+    // length should be equal to compareBuffer.Length
+    // buffer.Length should be equal to (compareBuffer.Length + 9) as the header has the size of 9 bytes (int64 = 8 bytes and 1 byte for the RecordType) 
 ```
 
 ## Contributing
