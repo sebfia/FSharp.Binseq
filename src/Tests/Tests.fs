@@ -31,7 +31,7 @@ module Types =
     }
 
 module Encoder =
-    open Binseq
+    open FSharp.Binseq
     open System
 
     let inline ofHeader recType (length: int64) =
@@ -66,7 +66,7 @@ module Encoder =
         *> ofBook x.FeaturedBook
 
 module Decoder =
-    open Binseq
+    open FSharp.Binseq
     open System
 
     let header = binseq {
@@ -115,7 +115,7 @@ module ``Simple Encoder and Decoder`` =
     open System
     open System.IO
     open NUnit.Framework
-    open Binseq
+    open FSharp.Binseq
 
     [<Test>]
     let ``Encoding and Decoding Boolean`` () =
@@ -310,7 +310,7 @@ module ``Simple Encoder and Decoder`` =
 module ``Back And Forth With More Complex Types`` =
     open System
     open NUnit.Framework
-    open Binseq
+    open FSharp.Binseq
 
     [<Test>]
     let ``Encoding and Decoding Circle Shape`` () =
@@ -383,7 +383,7 @@ module ``Back And Forth With More Complex Types`` =
 module ``Using the Record Module for Prepending Headers`` =
     open System
     open NUnit.Framework
-    open Binseq
+    open FSharp.Binseq
 
     type RecordType =
         | Book = 1uy
