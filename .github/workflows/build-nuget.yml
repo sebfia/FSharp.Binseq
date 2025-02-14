@@ -9,6 +9,8 @@ on:
       - src/Binseq/*.fs
       - src/Binseq/paket.references
       - src/Binseq/Binseq.fsproj.paket.template
+      - global.json
+      - paket.lock
       - .github/workflows/build-nuget.yml
 
 # permissions are needed if pushing to ghcr.io
