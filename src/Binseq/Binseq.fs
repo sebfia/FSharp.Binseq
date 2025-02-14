@@ -100,6 +100,8 @@
             let uint : Binseq<uint> = withReader (fun r -> r.ReadUInt32())
             let int64 : Binseq<int64> = withReader (fun r -> r.ReadInt64())
             let uint64 : Binseq<uint64> = withReader (fun r -> r.ReadUInt64())
+
+            let char : Binseq<char> = withReader (fun r -> r.ReadChar())
             let string : Binseq<string> = withReader (fun r -> 
                 let length = r.ReadInt32()
                 match length with | l when l > 0 -> r.ReadChars(length) |> String | _ -> String.Empty
@@ -221,6 +223,7 @@
             static member inline single (x: float32) : Binseq<unit> = Encode.encodeWithWriter (fun w -> Encode.safeCage (fun () -> w.Write(x)))
             static member inline bool (x: bool) : Binseq<unit> = Encode.encodeWithWriter (fun w -> Encode.safeCage (fun () -> w.Write(x)))
             static member inline decimal (x: decimal) : Binseq<unit> = Encode.encodeWithWriter (fun w -> Encode.safeCage (fun () -> w.Write(x)))
+            static member inline char (x: char) : Binseq<unit> = Encode.encodeWithWriter (fun w -> Encode.safeCage (fun () -> w.Write(x)))
             static member inline dateTime (x: DateTime) : Binseq<unit> = Encode.encodeWithWriter (fun w -> Encode.safeCage (fun () -> w.Write(x.ToBinary())))
             static member inline dateTimeUtcAsUnixNanos (x: DateTime) : Binseq<unit> = Encode.encodeWithWriter (fun w -> Encode.safeCage (fun () -> w.Write((x.ToUniversalTime().Ticks - DateTimeOffset.UnixEpoch.Ticks) * NANOS_PER_TICKS)))
             static member inline dateTimeOffset (x: DateTimeOffset) : Binseq<unit> = Encode.encodeWithWriter (fun w -> Encode.safeCage (fun () -> w.Write(x.Ticks); w.Write(x.Offset.Ticks)))
