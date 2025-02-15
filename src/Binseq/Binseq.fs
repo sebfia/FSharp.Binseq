@@ -94,6 +94,7 @@
                     | Reader r ->
                         try (f r |> Ok),bin with ex -> (Error $"An exeption was thrown while trying to decode a value.{Environment.NewLine}{ex}"),bin
             let byte : Binseq<byte> = withReader (fun r -> r.ReadByte())
+            let sbyte : Binseq<sbyte> = withReader (fun r -> r.ReadSByte())
             let int16 : Binseq<int16> = withReader (fun r -> r.ReadInt16())
             let uint16 : Binseq<uint16> = withReader (fun r -> r.ReadUInt16())
             let int : Binseq<int> = withReader (fun r -> r.ReadInt32())
@@ -214,6 +215,7 @@
                     Ok ()
                 with ex -> Error $"An exeption was thrown while trying to encode a value.{Environment.NewLine}{ex}"
             static member inline byte (x: byte) : Binseq<unit> = Encode.encodeWithWriter (fun w -> Encode.safeCage (fun () -> w.Write(x)))
+            static member inline sbyte (x: sbyte) : Binseq<unit> = Encode.encodeWithWriter (fun w -> Encode.safeCage (fun () -> w.Write(x)))
             static member inline uint16 (x: uint16) : Binseq<unit> = Encode.encodeWithWriter (fun w -> Encode.safeCage (fun () -> w.Write(x)))
             static member inline int16 (x: int16) : Binseq<unit> = Encode.encodeWithWriter (fun w -> Encode.safeCage (fun () -> w.Write(x)))
             static member inline int (x: int) : Binseq<unit> = Encode.encodeWithWriter (fun w -> Encode.safeCage (fun () -> w.Write(x)))

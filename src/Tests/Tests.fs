@@ -158,6 +158,11 @@ module ``Simple Encoder and Decoder`` =
         (Raw.fromBuffer Decode.byte) buffer |> Result.defaultWith (fun e -> failwith e) |> should equal 42uy
 
     [<Test>]
+    let ``Encoding and Decoding SByte`` () =
+        let buffer = (Encode.sbyte >> Raw.toBuffer) -42y |> Result.defaultWith (fun e -> failwith e)
+        (Raw.fromBuffer Decode.sbyte) buffer |> Result.defaultWith (fun e -> failwith e) |> should equal -42y
+
+    [<Test>]
     let ``Encoding and Decoding Single Char`` () =
         let buffer = (Encode.char >> Raw.toBuffer) 'C' |> Result.defaultWith (fun e -> failwith e)
         (Raw.fromBuffer Decode.byte) buffer |> Result.defaultWith (fun e -> failwith e) |> should equal 'C'
