@@ -262,6 +262,12 @@ module ``Simple Encoder and Decoder`` =
         (Raw.fromBuffer Decode.timeSpan) buffer |> Result.defaultWith (fun e -> failwith e) |> should equal expected
 
     [<Test>]
+    let ``Encoding and Decoding TimeSpan As Nanos`` () =
+        let expected = TimeSpan.FromHours(42.)
+        let buffer = (Encode.timeSpanAsNanos >> Raw.toBuffer) expected |> Result.defaultWith (fun e -> failwith e)
+        (Raw.fromBuffer Decode.timeSpanAsNanos) buffer |> Result.defaultWith (fun e -> failwith e) |> should equal expected
+
+    [<Test>]
     let ``Append Padding`` () =
         let expectedLength = 56
         let buffer = (Encode.appendPadding >> Raw.toBuffer) expectedLength|> Result.defaultWith (fun e -> failwith e)

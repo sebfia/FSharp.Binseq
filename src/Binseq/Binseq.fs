@@ -126,6 +126,7 @@
                 | i -> DateTimeOffset.UnixEpoch.AddTicks(i / NANOS_PER_TICKS) |> Some
             )
             let timeSpan : Binseq<TimeSpan> = withReader (fun r -> TimeSpan.FromTicks(r.ReadInt64()))
+            let timeSpanAsNanos : Binseq<TimeSpan> = withReader (fun r -> TimeSpan.FromTicks(r.ReadInt64() / NANOS_PER_TICKS))
             let guid : Binseq<Guid> = withReader (fun r -> Guid(r.ReadBytes(16)))
             let bytes : Binseq<byte array> = withReader (fun r -> r.ReadBytes(r.ReadInt32()))
             let inline skip length : Binseq<unit> = withReader (fun r -> r.ReadBytes(length) |> ignore)
