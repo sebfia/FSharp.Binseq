@@ -57,16 +57,11 @@ jobs:
         echo $VER >> temp && mv temp ./VERSION
         echo "build_version=$VER" >> $GITHUB_OUTPUT
     - 
-      name: Install paket as a global tool and add dotnet tools global path to PATH
-      run: |
-        dotnet tool install -g paket
-        echo "${HOME}/.dotnet/tools" >> $GITHUB_PATH
-    -
-      name: Install nuget packages with paket.
-      run: paket install
-    - 
       name: Restore local tools
       run: dotnet tool restore
+    -
+      name: Install nuget packages with paket.
+      run: dotnet tool run paket install
     - 
       name: Build project in release mode
       run: |
@@ -82,7 +77,7 @@ jobs:
       id: pack-nuget
       name: Pack NuGet package
       run: |
-        paket pack --build-config Release --version ${{ steps.version.outputs.build_version }} ${{ steps.determine-paths.outputs.output_path }}
+        dotnet tool run paket pack --build-config Release --version ${{ steps.version.outputs.build_version }} ${{ steps.determine-paths.outputs.output_path }}
     - 
       name: Publish Nuget
       run: dotnet nuget push ${{ steps.determine-paths.outputs.output_path }}/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_PUSH_TOKEN }}
